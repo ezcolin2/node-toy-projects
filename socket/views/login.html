@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>로그인</h1>
+    <form onsubmit="login(event)">
+      <input id="name" type="text" placeholder="이름" />
+      <input id="password" type="password" placeholder="비밀번호" />
+      <button type="submit">로그인</button>
+    </form>
+    <a href="join">회원가입 하러가기</a>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script>
+    function login(e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const password = document.getElementById("password").value;
+
+      axios
+        .post("/users/login", {
+          name,
+          password,
+        })
+        .then(function (response) {
+          alert(response.data.message);
+          if (response.data.code == 200) {
+            location.href = "/views/room";
+          }
+        })
+        .catch(function (error) {
+          alert(error.response.data.message);
+        });
+    }
+  </script>
+</html>

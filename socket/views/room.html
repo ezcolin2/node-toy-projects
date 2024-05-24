@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>채팅방</h1>
+    <h1 id="roomId"></h1>
+    <div>
+      <span>접속 인원 수</span>
+      <span id="count"></span>
+    </div>
+    <form onsubmit="sendMessage(event)">
+        <input id="message" placeholder="메시지를 입력하세요">
+        <button type="submit">전송</button>
+    </form>
+    <table>
+      <thead>
+        <tr>
+          <td>이름</td>
+          <td>채팅 내용</td>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const roomId = window.location.pathname.split('/').at(-1)
+    const socket = io.connect(`http://localhost:3001/rooms?roomId=${roomId}`, {
+      path: "/socket.io",
+      transports: ["websocket"],
+    });
+    socket.on("connect_error", (err) => {
+      console.log(JSON.parse(err.message));
+    });
+    socket.on("newMessage", (data) => {
+        console.log(data)
+      const { userName, message } = data;
+      const tbody = document.getElementById("tbody");
+      tbody.innerHTML += `
+            <tr>
+                <td>
+                    ${userName}
+                </td>
+                <td>
+                    ${message}
+                </td>
+            <tr>
+        `;
+    });
+    function sendMessage(e){
+        e.preventDefault()
+        const message = document.getElementById("message").value
+        socket.emit('chat', message)
+    }
+  </script>
+</html>
