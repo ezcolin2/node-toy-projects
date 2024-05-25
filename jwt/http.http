@@ -1,0 +1,2 @@
+GET http://localhost:3001/my-info
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NGM4NjM1MDI0NGJmYmVmOTFjOTkzOSIsImlhdCI6MTcxNjU5NTc0NX0.ZfCJAofb7K3kpZCbjtF9iBXeLVB0FXTWuNtWfdAjjcU
