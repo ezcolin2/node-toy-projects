@@ -1,0 +1,7 @@
+POST http://localhost:3001/users/join
+Content-Type: application/json
+
+{
+    "name": "minsoo",
+    "password": "minsoo"
+}
