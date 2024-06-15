@@ -152,16 +152,25 @@ describe("소켓 채팅방 테스트", () => {
       expect(rooms.length).toBe(0);
       // clientSocket.disconnect();
     });
-
-    let createdRoom;
+    let room;
     clientSocket.on("newRoom", (createdRoom)=>{
       console.log(createdRoom);
-      createdRoom = createdRoom;
+      room = createdRoom;
+      clientSocket.emit("deleteRoom", createdRoom._id);
     })
-    clientSocket.on("")
+    clientSocket.on("deletedRoom", (res)=>{
+      expect(res).toEqual({
+        code: 200,
+        message: `${room._id}번 방 삭제에 성공했습니다.`
+      })
+      done();
+    })
+    clientSocket.on("error", (error)=>{
+      console.log(error);
+      throw new Error(JSON.stringify(error));
+    })
     // 채팅방 생성
     clientSocket.emit("createRoom", "testName");
-
     // 
   })
 });

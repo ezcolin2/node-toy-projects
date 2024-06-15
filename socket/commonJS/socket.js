@@ -39,17 +39,37 @@ module.exports = (server) => {
       io.emit("newRoom", createdRoom);
     });
     socket.on("deleteRoom", async (_id) => {
-      const { acknowledged, _ } = Room.deleteOne({ _id });
-      if (acknowledged) {
-        return res.json({
-          code: 200,
-          message: "삭제에 성공했습니다.",
+      console.log(`${_id} 방 삭제 요청`)
+      const findRoom = await Room.findOne({_id});
+      if (!findRoom) {
+        // 찾은 방이 없는 경우에 대한 처리
+        io.to(socket.id).emit("error", {
+          code: 404,
+          message: `방을 찾을 수 없습니다.`
         });
+        return; 
       }
-      res.status(500).json({
+      // 만약 방 주인이 아닌 사람이 삭제 요청 보내면 거절
+      if (user.name != findRoom.master){
+        io.to(socket.id).emit("error", {
+          code: 403,
+          message: "방 삭제 권한이 없습니다."
+        })
+        return;
+      }
+      const { acknowledged, _ } = await Room.deleteOne({ _id });
+      if (acknowledged) {
+        io.emit("deletedRoom", {
+          code: 200,
+          message: `${_id}번 방 삭제에 성공했습니다.`
+        });
+        return;
+      } 
+      console.log(acknowledged);
+      io.to(socket.id).emit("error", {
         code: 500,
         message: "삭제에 실패했습니다.",
-      });
+      })
     });
   });
   const roomNamespace = io.of("/rooms");
