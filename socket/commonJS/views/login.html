@@ -23,7 +23,7 @@
       const password = document.getElementById("password").value;
 
       axios
-        .post("/users/login", {
+        .post("/api/v1/users/login", {
           name,
           password,
         })

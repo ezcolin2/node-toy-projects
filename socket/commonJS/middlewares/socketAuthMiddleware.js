@@ -1,5 +1,6 @@
 module.exports = {
     isAuthenticated: (socket, next) => {
+      console.log(`scket is authenticated ? ${socket.request.isAuthenticated()} `)
       if (socket.request.isAuthenticated()) {
         return next();
       }

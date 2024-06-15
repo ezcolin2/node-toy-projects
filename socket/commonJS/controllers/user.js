@@ -1,14 +1,7 @@
-const express = require('express')
 const User = require('../schemas/user')
 const bcrypt = require('bcrypt')
 const passport = require('passport')
-const router = express.Router()
-const {isAuthenticated, isNotAuthenticated} = require('../middlewares/apiAuthMiddleware')
-const mongoose = require("mongoose");
-
-
-
-router.post('/join', isNotAuthenticated, async (req, res)=>{
+const joinUser = async (req, res)=>{
     console.log(req.body)
     const {name, password} = req.body
     const newUser = new User({
@@ -29,33 +22,38 @@ router.post('/join', isNotAuthenticated, async (req, res)=>{
         code: 200,
         message: '회원가입 성공'
     })
-})
-router.post('/login', isNotAuthenticated, async(req, res, next)=>{
+}
+
+const loginUser = async(req, res, next)=>{
     passport.authenticate('local', (error, user, info)=>{  
         if (error){
             console.error(error)
             return next(error)
         }
         if (!user){
-            console.log(req.body)
-            console.log(info)
             return res.status(info.code).json(info)
         }
         return req.login(user, (error)=>{
             if(error){
                 return next(error)
             }
+            console.log(info)
             return res.status(info.code).json(info)
         })
 
     })(req, res, next)
-})
-router.get('/logout', isAuthenticated, (req, res)=>{
+}
+
+const logoutUser = async (req, res)=>{
     req.session.destroy()
     res.json({
         code: 200,
         message: '로그아웃에 성공했습니다.'
     })
-})
+}
 
-module.exports = router
+module.exports = {
+    joinUser,
+    loginUser,
+    logoutUser
+}

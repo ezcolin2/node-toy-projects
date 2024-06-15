@@ -5,8 +5,10 @@ const {
   isAuthenticated,
   isNotAuthenticated,
 } = require("./middlewares/socketAuthMiddleware");
+const sessionMiddleware = require('./middlewares/sessionMiddleware.js')
+
 // server를 받아서 socket과 연결
-module.exports = (server, sessionMiddleware) => {
+module.exports = (server) => {
   const io = SocketIO(server, {
     path: "/socket.io", // 프론트에서 expree 서버의 해당 경로의 socket.io.js에 접근 가능
   });

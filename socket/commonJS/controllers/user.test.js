@@ -101,8 +101,8 @@ describe('loginUser', ()=>{
 
     await loginUser(req, res, next);
 
-    expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.json).toHaveBeenCalledWith({ code: 404, message: "해당 유저가 존재하지 않습니다." });
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ code: 400, message: "비밀번호가 일치하지 않습니다." });
   })
   test('로그인 실패 유저 찾지 못 함', async ()=>{
     passport.authenticate.mockImplementationOnce((strategy, callback) => (req, res, next) => {
@@ -115,6 +115,7 @@ describe('loginUser', ()=>{
     expect(res.json).toHaveBeenCalledWith({ code: 404, message: "해당 유저가 존재하지 않습니다." });
   })
 })
+
 test('기본 테스트', ()=>{
     expect(1+1).toBe(2)
     expect(1+1).toEqual(2)

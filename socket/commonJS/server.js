@@ -1,0 +1,18 @@
+const express = require('express')
+const passport = require('passport')
+const passportConfig = require('./passport')
+const userRouter = require('./routes/user')
+const viewRouter = require('./routes/view')
+const connect = require('./schemas/index')
+const sessionMiddleware = require('./middlewares/sessionMiddleware.js')
+app = express()
+
+connect()
+app.use(express.json())
+app.use(sessionMiddleware)
+passportConfig()
+app.use(passport.initialize())
+app.use(passport.session())
+app.use('/api/v1/users', userRouter)
+app.use('/views', viewRouter)
+module.exports = app;
