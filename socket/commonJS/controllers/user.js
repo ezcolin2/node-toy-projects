@@ -1,3 +1,4 @@
+const { AxiosError } = require('axios')
 const User = require('../schemas/user')
 const bcrypt = require('bcrypt')
 const passport = require('passport')
@@ -11,6 +12,7 @@ const joinUser = async (req, res)=>{
     try{
         await newUser.save()
     } catch(error){
+        console.error(error)
         if(error.name == "MongoServerError" && error.code ==11000){
             return res.status(409).json({
                 code: 409,
