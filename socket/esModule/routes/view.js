@@ -1,8 +1,8 @@
 import express from 'express';
 import path from 'path';
 import { isAuthenticated, isNotAuthenticated } from '../middlewares/viewAuthMiddleware.js';
-import expose from './expose.cjs';
-const {__dirname} = expose;
+import dirname from './dirname.cjs';
+const {__dirname} = dirname;
 const router = express.Router();
 
 

@@ -1,6 +1,6 @@
 import webSocket from "./socket.js";
 import app from "./server.js";
-import io from "socket.io-client";
+import {io} from "socket.io-client";
 import request from "supertest";
 import mongoose from "mongoose";
 import sessionMiddleware from "./middlewares/sessionMiddleware.js";
@@ -72,7 +72,7 @@ describe("소켓 연결 테스트", () => {
 
   test("소켓 연결 성공", (done) => {
     console.log(loginResponse.headers["set-cookie"]);
-    clientSocket = io(`http://localhost:3002`, {
+    clientSocket = io(`http://localhost:${process.env.SERVER_PORT}`, {
       path: "/socket.io",
       extraHeaders: {
         Cookie: loginResponse.headers["set-cookie"],

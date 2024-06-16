@@ -1,4 +1,6 @@
 import session from 'express-session';
+import dotenv from '../dotenv/index.js';
+dotenv();
 const sessionMiddleware = session({
     cookie: {
       path: "/",

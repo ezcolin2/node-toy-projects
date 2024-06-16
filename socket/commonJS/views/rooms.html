@@ -9,7 +9,7 @@
     <h1>채팅방</h1>
     <button onclick="logout()">로그아웃</button>
     <form onsubmit="createRoom(event)">
-      <input id = "roomName" placeholder = "방 이름">
+      <input id="roomName" placeholder="방 이름" />
       <button type="submit">생성</button>
     </form>
 
@@ -31,27 +31,34 @@
       path: "/socket.io",
       transports: ["websocket"],
     });
-    socket.on("init", (data)=>{
-      console.log(data)
-      showRooms(data)
-      socket.off("init")
-    })
+    socket.on("init", (data) => {
+      console.log(data);
+      showRooms(data);
+      socket.off("init");
+    });
     socket.on("newMessage", (data) => {
       console.log(data);
     });
     socket.on("connect_error", (err) => {
-        console.log(JSON.parse(err.message))
-      });
+      console.log(JSON.parse(err.message));
+    });
     socket.on("newRoom", (newRoom) => {
-        const roomInfo = newRoom
-        document.getElementById('tbody').innerHTML+=`
-          <tr>
+      const roomInfo = newRoom;
+      document.getElementById("tbody").innerHTML += `
+          <tr id="${roomInfo._id}">
             <td>${roomInfo._id}</td>  
             <td>${roomInfo.name}</td>
             <td><a href = "/views/room/${roomInfo._id}">참가</a></td>
           </tr>
-        `
-      });
+        `;
+    });
+    socket.on("deletedRoom", (deletedRoom) => {
+      console.log(deletedRoom);
+      const trElement = document.getElementById(deletedRoom._id);
+      if (trElement) {
+        trElement.remove();
+      }
+    });
     function logout() {
       axios
         .get("/api/v1/users/logout")
@@ -64,21 +71,21 @@
           alert(error.response.data.message);
         });
     }
-    function createRoom(e){
-      e.preventDefault()
-      const roomName = document.getElementById('roomName').value
-      socket.emit('createRoom', roomName)
+    function createRoom(e) {
+      e.preventDefault();
+      const roomName = document.getElementById("roomName").value;
+      socket.emit("createRoom", roomName);
     }
-    function showRooms(rooms){
-      rooms.forEach((room)=>{
-        document.getElementById('tbody').innerHTML+=`
-          <tr>
+    function showRooms(rooms) {
+      rooms.forEach((room) => {
+        document.getElementById("tbody").innerHTML += `
+          <tr id="${roomInfo._id}">
             <td>${room._id}</td>  
             <td>${room.name}</td>
             <td><a href = "/views/room/${room._id}">참가</a></td>
           </tr>
-        `
-      })
+        `;
+      });
     }
   </script>
 </html>

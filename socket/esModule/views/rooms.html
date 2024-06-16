@@ -45,12 +45,19 @@
     socket.on("newRoom", (newRoom) => {
         const roomInfo = newRoom
         document.getElementById('tbody').innerHTML+=`
-          <tr>
+          <tr id = "${roomInfo._id}">
             <td>${roomInfo._id}</td>  
             <td>${roomInfo.name}</td>
             <td><a href = "/views/room/${roomInfo._id}">참가</a></td>
           </tr>
         `
+      });
+    socket.on("deletedRoom", (deletedRoom) => {
+      console.log(deletedRoom)
+        const trElement = document.getElementById(deletedRoom._id);
+        if (trElement) {
+          trElement.remove();
+        }
       });
     function logout() {
       axios

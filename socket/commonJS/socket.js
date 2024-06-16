@@ -85,7 +85,7 @@ module.exports = (server) => {
         userName: "system",
       message: `${user.name}님께서 입장하셨습니다.`,
     });
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async () => {
       roomNamespace
         .to(roomId)
         .emit("newMessage", {
@@ -93,6 +93,20 @@ module.exports = (server) => {
           message: `${user.name}님께서 접속을 종료하셨습니다.`,
         });
       socket.leave(roomId);
+      const cnt = roomNamespace.adapter.rooms.get(roomId)?.size || 0
+      console.log(`접속 인원 : ${cnt}`);
+      // 방에 아무도 없다면 삭제
+      if (cnt==0){
+        const { acknowledged } = await Room.deleteOne({ _id : roomId });
+        if (acknowledged) {
+          io.emit("deletedRoom", {
+            code: 200,
+            message: `${roomId}번 방 삭제에 성공했습니다.`,
+            _id: roomId
+          });
+          return;
+        }
+      }
     });
     socket.on("error", (error) => {
       console.error(error);

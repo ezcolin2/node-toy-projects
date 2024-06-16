@@ -51,7 +51,7 @@ describe("소켓 연결 테스트", () => {
     clientSocket.disconnect();
   });
   test("소켓 연결 실패 - 인증 실패", (done) => {
-    clientSocket = ioc(`http://localhost:3002`, {
+    clientSocket = ioc(`http://localhost:${process.env.SERVER_PORT}`, {
       path: "/socket.io",
     });
     clientSocket.on("connect_error", (error) => {
