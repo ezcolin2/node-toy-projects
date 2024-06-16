@@ -5,7 +5,6 @@ const ioc = require("socket.io-client");
 const session = require("express-session");
 const request = require("supertest");
 const mongoose = require("mongoose");
-const sessionMiddleware = require("./middlewares/sessionMiddleware.js");
 const initDB = async () => {
   const collections = mongoose.connection.collections;
 
@@ -23,7 +22,7 @@ describe("소켓 연결 테스트", () => {
     server = app.listen(process.env.SERVER_PORT, () => {
       console.log(`${process.env.SERVER_PORT} 포트 연결`);
     });
-    webSocket(server, sessionMiddleware);
+    webSocket(server);
     const joinResponse = await request(app).post("/api/v1/users/join").send({
       name: "minsoo",
       password: "minsoo",
@@ -100,7 +99,7 @@ describe("소켓 채팅방 테스트", () => {
     server = app.listen(process.env.SERVER_PORT, () => {
       console.log(`${process.env.SERVER_PORT} 포트 연결`);
     });
-    webSocket(server, sessionMiddleware);
+    webSocket(server);
     const joinResponse = await request(app).post("/api/v1/users/join").send({
       name: "minsoo",
       password: "minsoo",

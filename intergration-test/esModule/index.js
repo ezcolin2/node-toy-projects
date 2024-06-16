@@ -28,6 +28,5 @@ passportConfig()
 app.use(passport.initialize())
 app.use(passport.session())
 app.use('/users', userRouter)
-
 export default app;
 

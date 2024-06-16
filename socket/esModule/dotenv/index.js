@@ -1,9 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
+import expose from './expose.cjs';
+const {__dirname} = expose;
 export default () => {
   switch (process.env.NODE_ENV) {
     case 'dev':

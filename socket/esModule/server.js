@@ -1,13 +1,14 @@
 import express from 'express';
-import session from 'express-session';
 import passport from 'passport';
 import passportConfig from './passport/index.js';
 import userRouter from './routes/user.js';
 import viewRouter from './routes/view.js';
 import {connect} from './schemas/index.js';
-import webSocket from './socket.js';
 import sessionMiddleware from './middlewares/sessionMiddleware.js';
+import dotenv from './dotenv/index.js';
 
+// NODE_ENV 세팅
+dotenv();
 const app = express();
 
 
@@ -18,7 +19,7 @@ app.use(sessionMiddleware);
 passportConfig();
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/users', userRouter);
+app.use('/api/v1/users', userRouter);
 app.use('/views', viewRouter);
 
 export default app;

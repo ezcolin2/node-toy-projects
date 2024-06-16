@@ -54,7 +54,7 @@
       });
     function logout() {
       axios
-        .get("/users/logout")
+        .get("/api/v1/users/logout")
         .then((response) => {
           if (response.data.code == 200) {
             location.href = "/views/login";
