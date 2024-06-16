@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const connect = () => {
+export const connect = () => {
   mongoose.connect(`mongodb://${process.env.MONGODB_URL}/${process.env.MONGODB_NAME}`)
     .then(() => {
       console.log("mongodb 연결 성공");
@@ -19,4 +19,6 @@ const connect = () => {
   });
 };
 
-export default connect;
+export const disconnect = () => {
+  mongoose.connection.disconnect();
+}

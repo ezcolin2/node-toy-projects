@@ -5,9 +5,9 @@ import passportConfig from './passport/index.js';
 import userRouter from './routes/user.js';
 import connect from './schemas/index.js';
 
-const dotenv = require("./config/dotenv");
+import dotenv from "./config/dotenv/index.js";
 dotenv();
-app = express()
+const app = express()
 const sessionMiddleware = session({
     cookie: {
         path: "/",

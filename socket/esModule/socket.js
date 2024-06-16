@@ -2,9 +2,10 @@ import {Server} from "socket.io";
 import passport from "passport";
 import Room from "./schemas/room.js";
 import { isAuthenticated } from "./middlewares/socketAuthMiddleware.js";
+import sessionMiddleware from './middlewares/sessionMiddleware.js';
 // import { Server } from "http";
 
-export default function socketHandler(server, sessionMiddleware) {
+export default function socketHandler(server) {
   const io = new Server(server, {
     path: "/socket.io", // 프론트에서 expree 서버의 해당 경로의 socket.io.js에 접근 가능
   });
