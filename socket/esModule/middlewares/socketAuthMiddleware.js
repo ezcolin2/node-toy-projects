@@ -1,6 +1,10 @@
 const isAuthenticated = (socket, next) => {
+  console.log(socket.handshake.headers)
+  console.log(`세션 데이터 : ${JSON.stringify(socket.request.session)}`);
+  console.log(socket.request?.user)
   if (socket.request.isAuthenticated()) {
     return next();
+    
   }
   next(new Error(JSON.stringify({
     code: 401,

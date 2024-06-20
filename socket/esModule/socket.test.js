@@ -1,6 +1,6 @@
 import webSocket from "./socket.js";
 import app from "./server.js";
-import {io} from "socket.io-client";
+import { io } from "socket.io-client";
 import request from "supertest";
 import mongoose from "mongoose";
 import sessionMiddleware from "./middlewares/sessionMiddleware.js";
@@ -18,11 +18,11 @@ describe("소켓 연결 테스트", () => {
   let loginResponse;
   let server;
   let clientSocket;
-
+  const port = 8000
   beforeAll(async () => {
     await initDB();
-    server = app.listen(process.env.SERVER_PORT, () => {
-      console.log(`${process.env.SERVER_PORT} 포트 연결`);
+    server = app.listen(port, () => {
+      console.log(`${port} 포트 연결`);
     });
     webSocket(server);
     const joinResponse = await request(app).post("/api/v1/users/join").send({
@@ -55,7 +55,7 @@ describe("소켓 연결 테스트", () => {
   });
 
   test("소켓 연결 실패 - 인증 실패", (done) => {
-    clientSocket = io(`http://localhost:${process.env.SERVER_PORT}`, {
+    clientSocket = io(`http://localhost:${port}`, {
       path: "/socket.io",
     });
     clientSocket.on("connect_error", (error) => {
@@ -72,7 +72,7 @@ describe("소켓 연결 테스트", () => {
 
   test("소켓 연결 성공", (done) => {
     console.log(loginResponse.headers["set-cookie"]);
-    clientSocket = io(`http://localhost:${process.env.SERVER_PORT}`, {
+    clientSocket = io(`http://localhost:${port}`, {
       path: "/socket.io",
       extraHeaders: {
         Cookie: loginResponse.headers["set-cookie"],
@@ -95,12 +95,12 @@ describe("소켓 채팅방 테스트", () => {
   let newLoginResponse;
   let server;
   let clientSocket;
-
+  const port = 8001;
   // 시작하기 전에 로그인, 세션 접속
   beforeAll(async () => {
     await initDB();
-    server = app.listen(process.env.SERVER_PORT, () => {
-      console.log(`${process.env.SERVER_PORT} 포트 연결`);
+    server = app.listen(port, () => {
+      console.log(`${port} 포트 연결`);
     });
     webSocket(server);
     const joinResponse = await request(app).post("/api/v1/users/join").send({
@@ -157,7 +157,7 @@ describe("소켓 채팅방 테스트", () => {
   });
 
   test("채팅방 생성, 삭제 성공", (done) => {
-    clientSocket = io(`http://localhost:${process.env.SERVER_PORT}`, {
+    clientSocket = io(`http://localhost:${port}`, {
       path: "/socket.io",
       extraHeaders: {
         Cookie: loginResponse.headers["set-cookie"],
@@ -188,7 +188,7 @@ describe("소켓 채팅방 테스트", () => {
 
   test("채팅방 삭제 실패 - 권한 없음", (done) => {
     // 새로운 유저로 소켓 연결
-    const newClientSocket = io(`http://localhost:${process.env.SERVER_PORT}`, {
+    const newClientSocket = io(`http://localhost:${port}`, {
       path: "/socket.io",
       extraHeaders: {
         Cookie: newLoginResponse.headers["set-cookie"],
@@ -219,5 +219,126 @@ describe("소켓 채팅방 테스트", () => {
       done();
     });
     clientSocket.emit("deleteRoom", "ffffffffffffffffffffffff");
+  });
+});
+
+describe("채팅방 참여 테스트", () => {
+  let loginResponse;
+  let newLoginResponse;
+  let newLoginResponse2;
+  let server;
+  let clientSocket;
+  let room;
+  let roomSocket1;
+  let roomSocket2;
+  const port = 8002;
+  // 시작하기 전에 로그인, 세션 접속
+  beforeAll(async () => {
+    await initDB();
+    server = app.listen(port, () => {
+      console.log(`${port} 포트 연결`);
+    });
+    webSocket(server);
+  });
+  beforeEach(async () => {
+    const joinResponse = await request(app).post("/api/v1/users/join").send({
+      name: "minsoo",
+      password: "minsoo",
+    });
+    expect(joinResponse.statusCode).toEqual(200);
+    expect(joinResponse.body).toEqual({
+      code: 200,
+      message: "회원가입 성공",
+    });
+
+    loginResponse = await request(app).post("/api/v1/users/login").send({
+      name: "minsoo",
+      password: "minsoo",
+    });
+    expect(loginResponse.statusCode).toEqual(200);
+    expect(loginResponse.body).toEqual({
+      code: 200,
+      message: "로그인 성공",
+    });
+
+    // 새로운 유저 생성
+    const newJoinResponse = await request(app).post("/api/v1/users/join").send({
+      name: "chulsoo",
+      password: "chulsoo",
+    });
+    expect(newJoinResponse.statusCode).toEqual(200);
+    expect(newJoinResponse.body).toEqual({
+      code: 200,
+      message: "회원가입 성공",
+    });
+
+    newLoginResponse = await request(app).post("/api/v1/users/login").send({
+      name: "chulsoo",
+      password: "chulsoo",
+    });
+    expect(newLoginResponse.statusCode).toEqual(200);
+    expect(newLoginResponse.body).toEqual({
+      code: 200,
+      message: "로그인 성공",
+    });
+  });
+
+  // 테스트가 끝날 때마다 모든 이벤트 제거
+  afterEach(async () => {
+    await initDB();
+    clientSocket.removeAllListeners();
+  });
+
+  // 테스트가 모두 끝나면 서버 종료
+  afterAll(() => {
+    roomSocket1.disconnect();
+    clientSocket.disconnect();
+    server.close();
+  });
+  test("채팅방 접속 성공", (done) => {
+    // 접속
+    clientSocket = io(`http://localhost:${port}`, {
+      path: "/socket.io",
+      extraHeaders: {
+        Cookie: loginResponse.headers["set-cookie"],
+      },
+    });
+    clientSocket.on("init", (rooms) => {
+      expect(rooms.length).toBe(0);
+    });
+    // 방 하나 생성
+    clientSocket.on("newRoom", (createdRoom) => {
+      console.log(`새로운 방 정보 ${createdRoom._id}`);
+      console.log(loginResponse.headers["set-cookie"])
+      console.log(newLoginResponse.headers["set-cookie"])
+      clientSocket.disconnect();
+      roomSocket1 = io(
+        `http://localhost:${port}/rooms?roomId=${createdRoom._id}`,
+        {
+          path: "/socket.io",
+          extraHeaders: {
+            Cookie: loginResponse.headers["set-cookie"],
+          },
+        }
+      );
+      roomSocket1.on("newMessage", (message) => {
+        expect(message).toEqual({
+          userName: "system",
+          message: `minsoo님께서 입장하셨습니다.`,
+        });
+        
+        done();
+      });
+      roomSocket2 = io(
+        `http://localhost:${port}/rooms?roomId=${createdRoom._id}`,
+        {
+          path: "/socket.io",
+          extraHeaders: {
+            Cookie: newLoginResponse.headers["set-cookie"],
+          },
+        }
+      );
+    });
+    clientSocket.emit("createRoom", "testName");
   });
 });

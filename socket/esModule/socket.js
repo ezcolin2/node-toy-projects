@@ -25,6 +25,7 @@ export default (server) => {
     socket.emit("init", rooms);
     socket.on("disconnect", () => {
       console.log(`${user.name}님께서 접속을 종료하셨습니다.`);
+      // socket.disconnect();
     });
     socket.on("error", (error) => {
       console.error(error);
@@ -80,7 +81,10 @@ export default (server) => {
     const user = socket.request.user;
     console.log(user);
     const roomId = socket.handshake.query.roomId;
+    console.log(socket.handshake.query)
+    console.log(`room id : ${roomId}`)
     socket.join(roomId);
+    console.log(roomNamespace.adapter.rooms)
     console.log(`접속 인원 : ${roomNamespace.adapter.rooms.get(roomId).size}`);
     roomNamespace.to(roomId).emit("newMessage", {
       userName: "system",
