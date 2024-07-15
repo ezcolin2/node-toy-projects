@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Upload and Display</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    img {
+      max-width: 400px;
+      max-height: 400px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Upload Image</h2>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="file" id="fileInput" required>
+    <button type="submit">Upload</button>
+  </form>
+  <h2>Uploaded Image</h2>
+  <div id="imageContainer">
+    <p>No image uploaded yet.</p>
+  </div>
+
+  <script>
+    const uploadForm = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('fileInput');
+    const imageContainer = document.getElementById('imageContainer');
+
+    uploadForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      const formData = new FormData();
+      formData.append('image', fileInput.files[0]);
+
+      fetch('/images', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        displayImage(data.imageId);
+      })
+      .catch(error => console.error('Error uploading image:', error));
+    });
+
+    function displayImage(imageId) {
+      fetch(`/images/${imageId}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        
+        return response.blob();
+        
+      })
+      .then(blob => {
+        console.log(blob)
+        const imageUrl = URL.createObjectURL(blob);
+        console.log(imageUrl);
+        const imgElement = document.createElement('img');
+        imgElement.src = imageUrl;
+        imageContainer.innerHTML = '';
+        imageContainer.appendChild(imgElement);
+
+      })
+      .catch(error => console.error('Error fetching image:', error));
+    }
+  </script>
+</body>
+</html>
